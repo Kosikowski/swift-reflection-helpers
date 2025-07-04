@@ -7,9 +7,16 @@
 
 import Foundation
 
-enum FeedItem {}
+protocol Loggable {}
 
-func log(_ item: FeedItem) {
+// how to use
+enum FeedItem: Loggable {
+    case text(String)
+        case image(url: URL, caption: String?)
+        case ad(id: UUID)
+}
+
+func log(_ item: Loggable) {
     let m = Mirror(reflecting: item)
     print("case:", String(describing: m.subjectType)) // FeedItem
     if let child = m.children.first { // only one payload

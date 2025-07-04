@@ -10,7 +10,10 @@ import Foundation
 func stableDescription<T>(_ value: T) -> String {
     Mirror(reflecting: value)
         .children
-        .compactMap { ($0.label, "\($0.value)") }
+        .compactMap { child -> (String, String)? in
+            guard let label = child.label else { return nil }
+            return (label, "\(child.value)")
+        }
         .sorted { $0.0 < $1.0 }
         .map { "\($0)=\($1)" }
         .joined(separator: "\n")

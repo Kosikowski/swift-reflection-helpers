@@ -21,7 +21,7 @@ extension DefaultsStorable {
     }
 
     static func loadFromDefaults() -> Self {
-        var obj = Self()
+        let obj = Self()
         let defaults = suite
         for child in Mirror(reflecting: obj).children {
             guard let k = child.label else { continue }

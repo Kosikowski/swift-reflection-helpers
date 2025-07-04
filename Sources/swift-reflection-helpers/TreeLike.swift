@@ -45,9 +45,9 @@ extension TreeLike {
                 Mirror(reflecting: node).children.compactMap {
                     // accept either single-child or [T]
                     switch $0.value {
-                    case let c as T: return [c]
+                    case let c as T:   return [c]
                     case let arr as [T]: return arr
-                    default: return []
+                    default:           return []
                     }
                 }.flatMap { $0 }
             }

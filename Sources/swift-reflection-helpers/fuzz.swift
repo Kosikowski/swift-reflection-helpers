@@ -10,7 +10,7 @@ import Foundation
 /// Returns a new instance with randomised fields.
 /// Add cases as needed for domain types.
 func fuzz<T>(_ proto: T) -> T {
-    var copy = proto
+    let copy = proto
     for child in Mirror(reflecting: proto).children {
         guard let name = child.label else { continue }
         let newVal: Any = {

@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol DeepCopying { init() }
+protocol DeepCopying:DefaultInitializable {}
 
 extension DeepCopying {
     func deepCopy() -> Self {
-        var copy = Self()
+        let copy = Self()
         for child in Mirror(reflecting: self).children {
             guard let name = child.label else { continue }
             let value = child.value

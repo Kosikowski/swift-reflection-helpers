@@ -4,6 +4,7 @@
 //
 //  Created by Mateusz Kosikowski on 04/07/2025.
 //
+import Foundation
 
 protocol DictionaryConvertible {}
 extension DictionaryConvertible {
