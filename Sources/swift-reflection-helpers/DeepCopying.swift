@@ -9,7 +9,7 @@ import Foundation
 
 /// A protocol for objects that can be deeply copied using reflection.
 /// Requires conforming types to be default-initializable.
-protocol DeepCopying:DefaultInitializable {}
+protocol DeepCopying: DefaultInitializable {}
 
 /// Default implementation of deepCopy for types that conform to DeepCopying.
 extension DeepCopying {

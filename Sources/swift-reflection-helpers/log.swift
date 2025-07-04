@@ -12,8 +12,8 @@ protocol Loggable {}
 // how to use
 enum FeedItem: Loggable {
     case text(String)
-        case image(url: URL, caption: String?)
-        case ad(id: UUID)
+    case image(url: URL, caption: String?)
+    case ad(id: UUID)
 }
 
 func log(_ item: Loggable) {

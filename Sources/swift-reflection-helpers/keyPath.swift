@@ -8,31 +8,31 @@
 import Foundation
 
 /*
-Dynamic creation of key paths from property names at runtime is not possible in Swift due to its static type system.
+ Dynamic creation of key paths from property names at runtime is not possible in Swift due to its static type system.
 
-Instead, to enable iteration over a type's key paths, you can adopt a protocol that requires
-an explicit dictionary mapping property names to their key paths.
+ Instead, to enable iteration over a type's key paths, you can adopt a protocol that requires
+ an explicit dictionary mapping property names to their key paths.
 
-Example:
+ Example:
 
-protocol KeyPathIterable {
-    static var allKeyPaths: [String: AnyKeyPath] { get }
-}
+ protocol KeyPathIterable {
+     static var allKeyPaths: [String: AnyKeyPath] { get }
+ }
 
-struct User: KeyPathIterable {
-    var name: String
-    var age: Int
+ struct User: KeyPathIterable {
+     var name: String
+     var age: Int
 
-    static let allKeyPaths: [String: AnyKeyPath] = [
-        "name": \User.name,
-        "age": \User.age
-    ]
-}
+     static let allKeyPaths: [String: AnyKeyPath] = [
+         "name": \User.name,
+         "age": \User.age
+     ]
+ }
 
-This approach provides a type-safe and explicit way to access properties dynamically.
-*/
+ This approach provides a type-safe and explicit way to access properties dynamically.
+ */
 //
-//func keyPaths<T: DefaultInitializable>(_ type: T.Type) -> [String: AnyKeyPath] {
+// func keyPaths<T: DefaultInitializable>(_ type: T.Type) -> [String: AnyKeyPath] {
 //    Mirror(reflecting: type.init())
 //        .children
 //        .compactMap { child in
@@ -40,4 +40,4 @@ This approach provides a type-safe and explicit way to access properties dynamic
 //            return (name, \T.self[keyPath: name]) //via reflection
 //        }
 //        .reduce(into: [:]) { $0[$1.0] = $1.1 }
-//}
+// }
