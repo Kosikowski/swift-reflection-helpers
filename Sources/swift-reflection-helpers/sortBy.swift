@@ -4,89 +4,104 @@
 //
 //  Created by Mateusz Kosikowski on 04/07/2025.
 //
-/// This file provides utilities to sort arrays by a property name using Swift's reflection capabilities.
-/// It includes a generic function and an Array extension that enable sorting elements based on the value
-/// of a specified property key, which is determined at runtime.
+
+/// Utilities for sorting arrays by a property name using Swift reflection.
 ///
-/// These utilities rely on the property values conforming to Comparable for sorting purposes.
-/// Since they use reflection, they may have performance implications compared to compile-time property access.
-/// Additionally, sorting will silently fail (default to returning false) if the property cannot be found
-/// or if the property values are not Comparable.
+/// Provides a generic function and an Array extension for sorting elements based on the runtime value of a specified property.
+///
+/// - Only properties conforming to Comparable will be sorted.
+/// - Reflection adds overhead; for performance-critical code, prefer direct property access.
+/// - If a property isn't found or isn't Comparable, sorting falls back to the original order for those elements.
+///
 
 import Foundation
 
-/// Sorts the given array in place based on the value of a property with the specified name.
+extension Comparable {
+    /// Type-erased comparison for Comparable values, bridging to ComparisonResult.
+    ///
+    /// Returns .orderedSame if the input isn't the same type as self.
+    func compareTo(other: Any) -> ComparisonResult {
+        guard let other = other as? Self else {
+            return .orderedSame
+        }
+        if self < other { return .orderedAscending }
+        if self > other { return .orderedDescending }
+        return .orderedSame
+    }
+}
+
+/// Sorts an array in place by the value of a property with the given name using reflection.
 /// - Parameters:
-///   - key: The name of the property to sort by. This should be an exact property name of the elements in the array.
-///   - array: The array of generic type T to be sorted in place.
+///   - key: Property name for sorting. Must match a property on all elements.
+///   - array: The array to sort in place.
 ///
-/// This function uses reflection to access the property values by name on each element at runtime.
-/// The property values must conform to Comparable, otherwise the sorting will not reorder those elements.
+/// The property value must conform to Comparable. If the property isn't found or isn't Comparable, those elements retain their relative order.
 ///
-/// Limitations:
-/// - If the property name does not exist on an element, the comparison defaults to false, which may lead to
-///   unexpected orderings.
-/// - Reflection-based access is less performant than direct property access.
-/// - The function assumes homogeneous arrays where all elements have the property.
+/// - Performance: Reflection is slower than direct property access. Use for dynamic property names only when necessary.
 ///
-/// Usage example:
+/// Example:
 /// ```swift
-/// struct Person {
-///   let name: String
-///   let age: Int
-/// }
+/// struct Person { let name: String; let age: Int }
 /// var people = [Person(name: "Alice", age: 30), Person(name: "Bob", age: 25)]
 /// sortBy("age", array: &people)
 /// ```
+func sortBy<T>(_ key: String, array: inout [T]) {
+    array.sort {
+        guard
+            let l = value(of: $0, whereName: { $0 == key }),
+            let r = value(of: $1, whereName: { $0 == key }),
+            type(of: l) == type(of: r)
+        else {
+            // If either property value isn't found or types don't match, keep original order
+            return false
+        }
 
-// func sortBy<T>(_ key: String, array: inout [T]) {
-//    array.sort {
-//        guard
-//            // Access the property value of the left element using reflection and cast it to Comparable
-//            let l = value(of: $0, whereName: { $0 == key }) as? Comparable,
-//            // Access the property value of the right element similarly
-//            let r = value(of: $1, whereName: { $0 == key }) as? Comparable
-//        else {
-//            // If either property value isn't found or not Comparable, keep original order for these elements
-//            return false
-//        }
-//        return l < r
-//    }
-// }
+        // Attempt to compare if the property type conforms to Comparable
+        switch l {
+        case let left as any Comparable:
+            // Safe to force-cast r now, since we know the types match
+            let right = r as! (any Comparable)
+            // Use type-erased comparison
+            return left.compareTo(other: right) == .orderedAscending
+        default:
+            return false
+        }
+    }
+}
 
-/// An extension on Array to provide an instance method for sorting by a property name using reflection.
-/// This method sorts the array in place by comparing the values of a property with a given key.
+/// Sorts the array in place by a property name using reflection.
+/// - Parameter key: The name of the property to sort by.
 ///
-/// Note:
-/// - The property values must conform to Comparable.
-/// - If the property is not found or values cannot be cast to Comparable, those comparisons return false,
-///   which can lead to partial or no sorting.
-/// - Reflection may impact performance compared to direct sorting with closures.
+/// The property value must conform to Comparable. If the property isn't found or isn't Comparable, those elements retain their original order.
 ///
-/// Usage example:
+/// Example:
 /// ```swift
-/// struct Person {
-///   let name: String
-///   let age: Int
-/// }
+/// struct Person { let name: String; let age: Int }
 /// var people = [Person(name: "Alice", age: 30), Person(name: "Bob", age: 25)]
 /// people.sortBy("age")
 /// ```
-
-// extension Array {
-//    /// Sorts the array in place by a property name using reflection.
-//    /// - Parameter key: The name of the property to sort by.
-//    mutating func sortBy(_ key: String) {
-//        sort {
-//            // Reflect on the first element and look for a child with the matching property name
-//            guard
-//                let l = Mirror(reflecting: $0).children.first(where: { $0.label == key })?.value as? Comparable,
-//                let r = Mirror(reflecting: $1).children.first(where: { $0.label == key })?.value as? Comparable
-//            else {
-//                // If property not found or not Comparable, retain existing order for these elements
-//                return false
-//            }
-//            return l < r
-//        }
-//    }
-// }
+extension Array {
+    /// Sorts the array in place by a property name using reflection.
+    /// - Parameter key: The name of the property to sort by.
+    mutating func sortBy(_ key: String) {
+        sort {
+            // Reflect on each element and look for a child with the matching property name
+            guard
+                let l = Mirror(reflecting: $0).children.first(where: { $0.label == key })?.value,
+                let r = Mirror(reflecting: $1).children.first(where: { $0.label == key })?.value,
+                type(of: l) == type(of: r)
+            else {
+                // If property not found or types don't match, retain existing order
+                return false
+            }
+            // Attempt to compare if the property type conforms to Comparable
+            switch l {
+            case let left as any Comparable:
+                let right = r as! (any Comparable)
+                return left.compareTo(other: right) == .orderedAscending
+            default:
+                return false
+            }
+        }
+    }
+}

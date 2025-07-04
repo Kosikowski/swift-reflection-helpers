@@ -25,18 +25,18 @@ func patch<T>(_ old: T, _ new: T) -> [(String, Any)] {
 }
 
 /*
-// Example use case:
+ // Example use case:
 
-struct User {
-    var name: String
-    var age: Int
-    var email: String
-}
+ struct User {
+     var name: String
+     var age: Int
+     var email: String
+ }
 
-let oldUser = User(name: "Alice", age: 30, email: "alice@mail.com")
-let newUser = User(name: "Alice", age: 31, email: "alice@work.com")
+ let oldUser = User(name: "Alice", age: 30, email: "alice@mail.com")
+ let newUser = User(name: "Alice", age: 31, email: "alice@work.com")
 
-let diffs = patch(oldUser, newUser)
-// diffs will be:
-// [("age", 31), ("email", "alice@work.com")]
-*/
+ let diffs = patch(oldUser, newUser)
+ // diffs will be:
+ // [("age", 31), ("email", "alice@work.com")]
+ */

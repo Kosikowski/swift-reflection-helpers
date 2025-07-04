@@ -8,7 +8,7 @@
 import Foundation
 
 /// Protocol to allow conforming types to be saved to and loaded from UserDefaults.
-protocol DefaultsStorable { init() }
+protocol DefaultsStorable: DefaultInitializable {}
 
 /// Provides default implementation for saving and loading conforming types to/from UserDefaults.
 extension DefaultsStorable {

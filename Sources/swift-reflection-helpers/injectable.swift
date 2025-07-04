@@ -36,7 +36,7 @@ protocol Injectable {
     - c: The container to register found instances into.
 
  This is typically used for automatic wiring with Xcode Build Tool Plugins or similar tooling.
-*/
+ */
 func autoWire(types: [Any.Type], into c: Container) {
     for type in types {
         // Check if type conforms to Injectable
@@ -48,7 +48,7 @@ func autoWire(types: [Any.Type], into c: Container) {
     }
 }
 
-//---
+// ---
 // Example Usage:
 //
 // /// Example service conforming to Injectable
@@ -63,4 +63,4 @@ func autoWire(types: [Any.Type], into c: Container) {
 // autoWire(types: [MyService.self], into: container)
 //
 // // At this point, the container has an instance of MyService registered.
-//---
+// ---

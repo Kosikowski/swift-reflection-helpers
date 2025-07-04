@@ -15,27 +15,27 @@ protocol TrackableField {}
 }
 
 /*
-// Example use case:
+ // Example use case:
 
-// Define a data structure with some fields marked as @TrackableProperty
-struct SignUpData {
-    @TrackableProperty var email: String = ""
-    @TrackableProperty var password: String = ""
-    var rememberMe: Bool = false // not a form field, not tracked
-}
+ // Define a data structure with some fields marked as @TrackableProperty
+ struct SignUpData {
+     @TrackableProperty var email: String = ""
+     @TrackableProperty var password: String = ""
+     var rememberMe: Bool = false // not a form field, not tracked
+ }
 
-let formData = SignUpData()
-let trackedFields = gatherFieldsToTrack(formData)
-print(trackedFields) // Output: ["email", "password"]
-*/
+ let formData = SignUpData()
+ let trackedFields = gatherFieldsToTrack(formData)
+ print(trackedFields) // Output: ["email", "password"]
+ */
 
 /// Gathers the property names of all fields marked as TrackableProperty in a given instance.
 /// Uses Swift reflection to enumerate properties conforming to TrackableField.
 func gatherFieldsToTrack<T>(_ vm: T) -> [String] {
     Mirror(reflecting: vm).children.compactMap { child in
-        // Only include children whose value is a TrackableField
         guard child.value is TrackableField else { return nil }
-        // Return the property's label (name)
-        return child.label
+        guard let label = child.label else { return nil }
+        // If the label starts with an underscore, strip it
+        return label.hasPrefix("_") ? String(label.dropFirst()) : label
     }
 }

@@ -34,20 +34,25 @@ import Foundation
  */
 
 func dot<T: TreeLike>(_ root: T) -> String {
-    // Start the DOT graph declaration
     var lines = ["digraph G {"]
 
-    // Recursively walk the tree and add edges
     func walk(_ parent: T) {
-        // For every child node, add an edge and recurse
-        for child in Mirror(reflecting: parent).children.compactMap({ $0.value as? T }) {
-            lines.append("  \"\(parent)\" -> \"\(child)\";")
-            walk(child)
+        for child in Mirror(reflecting: parent).children {
+            switch child.value {
+            case let c as T:
+                lines.append("  \"\(parent)\" -> \"\(c)\";")
+                walk(c)
+            case let arr as [T]:
+                for c in arr {
+                    lines.append("  \"\(parent)\" -> \"\(c)\";")
+                    walk(c)
+                }
+            default:
+                continue
+            }
         }
     }
     walk(root)
-    // Close the DOT graph declaration
     lines.append("}")
-    // Return the DOT representation as a single string
     return lines.joined(separator: "\n")
 }
